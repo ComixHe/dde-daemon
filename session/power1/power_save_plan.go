@@ -272,6 +272,7 @@ func (psp *powerSavePlan) powerSavingModeIsMultiLevelAdjustment(maxBacklightBrig
 
 // 节能模式亮度统一策略处理：根据当前非节能模式亮度和自动降低亮度比例配置，计算出节能模式需要降低的亮度
 func (psp *powerSavePlan) powerSavingModeBrightnessDrop(brightness, scale float64) float64 {
+	logger.Info("powerSavingModeBrightnessDrop: brightness=", brightness, " scale=", scale)
 	newBrightness := math.Round(brightness * 100 * (1 - scale/100))
 	newBrightness = newBrightness / 100
 	if newBrightness > 1.0 {
@@ -284,6 +285,7 @@ func (psp *powerSavePlan) powerSavingModeBrightnessDrop(brightness, scale float6
 
 // 节能模式亮度统一策略处理：根据当前节能模式下的亮度和自动降低亮度比例配置，计算出恢复到非节能模式后的亮度
 func (psp *powerSavePlan) powerSavingModeBrightnessRestored(brightness, scale float64) float64 {
+	logger.Info("powerSavingModeBrightnessRestored: brightness=", brightness, " scale=", scale)
 	newBrightness := math.Round(brightness * 100 / (1 - scale/100))
 	newBrightness = newBrightness / 100
 	if newBrightness > 1.0 {

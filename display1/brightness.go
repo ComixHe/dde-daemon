@@ -193,6 +193,7 @@ func (m *Manager) setMonitorBrightness(monitor *Monitor, brightnessValue float64
 }
 
 func (m *Manager) setBrightnessAux(fake bool, name string, value float64) error {
+	logger.Info("setBrightnessAux:", name, value)
 	monitors := m.getConnectedMonitors()
 	monitor := monitors.GetByName(name)
 	if monitor == nil {
@@ -203,21 +204,22 @@ func (m *Manager) setBrightnessAux(fake bool, name string, value float64) error 
 	enabled := monitor.Enabled
 	monitor.PropsMu.RUnlock()
 
-	value = math.Round(value*1000) / 1000 // 通过该方法，用来对亮度值(亮度值范围为0-1)四舍五入保留小数点后三位有效数字
+	newValue := math.Round(value*1000) / 1000 // 通过该方法，用来对亮度值(亮度值范围为0-1)四舍五入保留小数点后三位有效数字
 	if !fake && enabled {
 		temperature := m.getColorTemperatureValue()
 		// 保持最小亮度，不能全黑
-		if value <= 0.1 {
-			value = 0.1
+		if newValue <= 0.1 {
+			logger.Warning("newValue <= 0.1, set to 0.1")
+			newValue = 0.1
 		}
-		err := m.setMonitorBrightness(monitor, value, temperature)
+		err := m.setMonitorBrightness(monitor, newValue, temperature)
 		if err != nil {
 			logger.Warningf("failed to set brightness for %s: %v", name, err)
 			return err
 		}
 	}
 
-	monitor.setPropBrightnessWithLock(value)
+	monitor.setPropBrightnessWithLock(newValue)
 
 	return nil
 }
